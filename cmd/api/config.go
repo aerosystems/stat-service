@@ -7,5 +7,15 @@ import (
 
 type Config struct {
 	Log         *logrus.Logger
-	BaseHandler handlers.BaseHandler
+	BaseHandler *handlers.BaseHandler
+}
+
+func NewConfig(
+	log *logrus.Logger,
+	baseHandler *handlers.BaseHandler,
+) *Config {
+	return &Config{
+		Log:         log,
+		BaseHandler: baseHandler,
+	}
 }
