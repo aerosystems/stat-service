@@ -1,6 +1,7 @@
 FROM alpine:latest
 RUN mkdir /app
 RUN mkdir /app/logs
+RUN mkdir /app/certs
 
 COPY ./stat-service/stat-service.bin /app
 
