@@ -3,6 +3,7 @@ package elastic
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 	"net/http"
@@ -19,6 +20,10 @@ func NewClient() *elasticsearch.Client {
 	host := os.Getenv("ELASTIC_HOST")
 	if host == "" {
 		log.Panic("Elasticsearch host wasn't set")
+	}
+	password := os.Getenv("ELASTIC_PASSWORD")
+	if password == "" {
+		log.Panic("Elasticsearch password wasn't set")
 	}
 
 	caCert, err := os.ReadFile(caCertPath)
@@ -38,6 +43,10 @@ func NewClient() *elasticsearch.Client {
 		},
 	}
 
+	auth := base64.StdEncoding.EncodeToString([]byte("elastic:" + password))
+	cfg.Header = http.Header{}
+	cfg.Header.Set("Authorization", "Basic "+auth)
+
 	count := 0
 	for {
 		es, err := elasticsearch.NewClient(cfg)
@@ -50,7 +59,6 @@ func NewClient() *elasticsearch.Client {
 			count++
 		} else {
 			log.Println("Connected to Elasticsearch")
-			log.Println(es)
 			return es
 		}
 		log.Println("Backing off for two seconds...")

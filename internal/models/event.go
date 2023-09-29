@@ -6,10 +6,9 @@ type Event struct {
 	Domain       string `json:"domain"`
 	Type         string `json:"type"`
 	ProjectToken string `json:"projectToken"`
-	Duration     int64  `json:"duration"`
-	Source       string `json:"source"`
+	Duration     int    `json:"duration"`
 }
 
 type EventRepository interface {
-	GetByProjectToken(projectToken string) ([]Event, error)
+	GetByProjectToken(projectToken string, size, from int) ([]Event, error)
 }

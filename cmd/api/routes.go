@@ -28,9 +28,9 @@ func (app *Config) NewRouter() *echo.Echo {
 	docsGroup.Use(middleware.BasicAuthMiddleware)
 	docsGroup.GET("/*", echoSwagger.WrapHandler)
 
-	apiGroup := e.Group("/v1")
-	apiGroup.Use(middleware.AuthTokenMiddleware())
-	apiGroup.GET("/stat", app.BaseHandler.GetStat)
+	//apiGroup := e.Group("/v1")
+	//apiGroup.Use(middleware.AuthTokenMiddleware())
+	e.GET("/v1/events", app.BaseHandler.GetEvents)
 
 	return e
 }
