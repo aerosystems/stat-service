@@ -1,0 +1,107 @@
+basePath: /
+definitions:
+  handlers.ErrResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  handlers.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  models.Event:
+    properties:
+      domain:
+        type: string
+      duration:
+        type: integer
+      event:
+        type: string
+      projectToken:
+        type: string
+      rawData:
+        type: string
+      type:
+        type: string
+    type: object
+host: api.verifire.com
+info:
+  contact:
+    name: Artem Kostenko
+    url: https://github.com/aerosystems
+  description: A part of microservice infrastructure, who responsible for statistics
+    events
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Stat Service API
+  version: 1.0.0
+paths:
+  /v1/events:
+    get:
+      consumes:
+      - application/json
+      description: Get Events by project token
+      parameters:
+      - description: Project Token
+        in: query
+        name: projectToken
+        required: true
+        type: string
+      - description: Limit. Must be integer. Default 10
+        in: query
+        name: limit
+        type: integer
+      - description: Offset. Must be integer. Default 0
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Event'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Events
+      tags:
+      - events
+schemes:
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Should contain Access JWT Token, with the Bearer started
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

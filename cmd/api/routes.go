@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/aerosystems/stat-service/docs"
 	"github.com/aerosystems/stat-service/internal/middleware"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -28,9 +29,7 @@ func (app *Config) NewRouter() *echo.Echo {
 	docsGroup.Use(middleware.BasicAuthMiddleware)
 	docsGroup.GET("/*", echoSwagger.WrapHandler)
 
-	//apiGroup := e.Group("/v1")
-	//apiGroup.Use(middleware.AuthTokenMiddleware())
-	e.GET("/v1/events", app.BaseHandler.GetEvents)
+	e.GET("/v1/events", app.BaseHandler.GetEvents, middleware.AuthTokenMiddleware())
 
 	return e
 }

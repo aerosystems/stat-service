@@ -1,5 +1,7 @@
 package models
 
+import "github.com/aerosystems/stat-service/internal/pagination"
+
 type Event struct {
 	Name         string `json:"event"`
 	RawData      string `json:"rawData"`
@@ -10,5 +12,5 @@ type Event struct {
 }
 
 type EventRepository interface {
-	GetByProjectToken(projectToken string, size, from int) ([]Event, error)
+	GetByProjectToken(projectToken, eventType string, pagination pagination.Range) ([]Event, error)
 }

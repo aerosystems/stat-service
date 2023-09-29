@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"errors"
-	AuthService "github.com/aerosystems/adapter-service/pkg/auth_service"
+	AuthService "github.com/aerosystems/stat-service/pkg/auth_service"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -44,7 +44,8 @@ func AuthTokenMiddleware() echo.MiddlewareFunc {
 				return AuthorizationConfig.ErrorHandler(c, errors.New("token expired"))
 			}
 
-			echo.Context(c).Set("token", token)
+			echo.Context(c).Set("userId", accessTokenClaims.UserID)
+			echo.Context(c).Set("userRole", accessTokenClaims.UserRole)
 			return next(c)
 		}
 	}

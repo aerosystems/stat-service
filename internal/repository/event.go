@@ -3,6 +3,7 @@ package repository
 import (
 	"encoding/json"
 	"github.com/aerosystems/stat-service/internal/models"
+	"github.com/aerosystems/stat-service/internal/pagination"
 	"github.com/aerosystems/stat-service/internal/transformator"
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
@@ -19,7 +20,7 @@ func NewEventRepo(es *elasticsearch.Client) *EventRepo {
 	}
 }
 
-func (e *EventRepo) GetByProjectToken(projectToken string, size, from int) ([]models.Event, error) {
+func (e *EventRepo) GetByProjectToken(projectToken, eventType string, pagination pagination.Range) ([]models.Event, error) {
 	query := `{
 				  "_source": ["@timestamp", "message", "container"],
 				  "query": {
@@ -32,7 +33,7 @@ func (e *EventRepo) GetByProjectToken(projectToken string, size, from int) ([]mo
 						},
 						{
 						  "match": {
-							"message": "{\"projectToken\":\"` + projectToken + `\"}"
+							"message": "{\"projectToken\":\"` + projectToken + `\", \"event\":\"` + eventType + `\"}"
 						  }
 						}
 					  ]
@@ -42,8 +43,8 @@ func (e *EventRepo) GetByProjectToken(projectToken string, size, from int) ([]mo
 	res, err := e.es.Search(
 		e.es.Search.WithBody(strings.NewReader(query)),
 		e.es.Search.WithPretty(),
-		e.es.Search.WithSize(size),
-		e.es.Search.WithFrom(from),
+		e.es.Search.WithSize(pagination.Limit),
+		e.es.Search.WithFrom(pagination.Offset),
 	)
 	if err != nil {
 		return nil, err
