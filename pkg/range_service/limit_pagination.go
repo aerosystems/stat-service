@@ -1,4 +1,4 @@
-package pagination
+package RangeService
 
 import (
 	"errors"
@@ -10,19 +10,19 @@ const (
 	DefaultOffset = 0
 )
 
-type Range struct {
+type LimitPagination struct {
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
 }
 
-func NewRange(limit, offset int) *Range {
-	return &Range{
+func NewLimitPagination(limit, offset int) *LimitPagination {
+	return &LimitPagination{
 		Limit:  limit,
 		Offset: offset,
 	}
 }
 
-func GetFromQuery(query map[string][]string) (*Range, error) {
+func GetLimitPaginationFromQuery(query map[string][]string) (*LimitPagination, error) {
 	limit := DefaultLimit
 	offset := DefaultOffset
 	var err error
@@ -41,5 +41,5 @@ func GetFromQuery(query map[string][]string) (*Range, error) {
 		}
 	}
 
-	return NewRange(limit, offset), nil
+	return NewLimitPagination(limit, offset), nil
 }

@@ -2,6 +2,7 @@ package transformator
 
 import (
 	"github.com/aerosystems/stat-service/internal/models"
+	"time"
 )
 
 type ElasticSearchRecord struct {
@@ -18,6 +19,10 @@ type ElasticSearchRecord struct {
 }
 
 func (es *ElasticSearchRecord) ToEventModel() models.Event {
+	t, err := time.Parse(time.RFC3339, es.Time)
+	if err != nil {
+		t = time.Now()
+	}
 	return models.Event{
 		Name:         es.Event,
 		RawData:      es.RawData,
@@ -25,5 +30,6 @@ func (es *ElasticSearchRecord) ToEventModel() models.Event {
 		Type:         es.Type,
 		ProjectToken: es.ProjectToken,
 		Duration:     es.Duration,
+		Time:         t,
 	}
 }

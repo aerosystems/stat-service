@@ -3,8 +3,8 @@ package repository
 import (
 	"encoding/json"
 	"github.com/aerosystems/stat-service/internal/models"
-	"github.com/aerosystems/stat-service/internal/pagination"
 	"github.com/aerosystems/stat-service/internal/transformator"
+	RangeService "github.com/aerosystems/stat-service/pkg/range_service"
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 	"strings"
@@ -20,9 +20,8 @@ func NewEventRepo(es *elasticsearch.Client) *EventRepo {
 	}
 }
 
-func (e *EventRepo) GetByProjectToken(projectToken, eventType string, pagination pagination.Range) ([]models.Event, error) {
+func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]models.Event, error) {
 	query := `{
-				  "_source": ["@timestamp", "message", "container"],
 				  "query": {
 					"bool": {
 					  "must": [
@@ -35,6 +34,14 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, pagination
 						  "match": {
 							"message": "{\"projectToken\":\"` + projectToken + `\", \"event\":\"` + eventType + `\"}"
 						  }
+						},
+						{
+						  "range": {
+							"@timestamp": {
+							  "gte": "` + timeRange.Start.Format("2006-01-02T15:04:05.000Z") + `",
+							  "lte": "` + timeRange.End.Format("2006-01-02T15:04:05.000Z") + `"
+							}
+						  }
 						}
 					  ]
 					}
@@ -45,6 +52,8 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, pagination
 		e.es.Search.WithPretty(),
 		e.es.Search.WithSize(pagination.Limit),
 		e.es.Search.WithFrom(pagination.Offset),
+		e.es.Search.WithSort("@timestamp:desc"),
+		e.es.Search.WithSource("@timestamp", "message", "container"),
 	)
 	if err != nil {
 		return nil, err
@@ -65,6 +74,7 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, pagination
 			continue
 		}
 		event := ESEvent.ToEventModel()
+		log.Println("@@@", message)
 		eventList = append(eventList, event)
 	}
 	return eventList, nil

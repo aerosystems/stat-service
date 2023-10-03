@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/aerosystems/stat-service/internal/helpers"
-	"github.com/aerosystems/stat-service/internal/pagination"
 	RPCClient "github.com/aerosystems/stat-service/internal/rpc_client"
+	RangeService "github.com/aerosystems/stat-service/pkg/range_service"
 	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
@@ -29,7 +29,11 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 	userId := c.Get("userId").(int)
 	userRole := c.Get("userRole").(string)
 	projectToken := c.QueryParam("projectToken")
-	pagination, err := pagination.GetFromQuery(c.QueryParams())
+	pagination, err := RangeService.GetLimitPaginationFromQuery(c.QueryParams())
+	if err != nil {
+		return ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
+	}
+	timeRange, err := RangeService.GetTimeRangeFromQuery(c.QueryParams())
 	if err != nil {
 		return ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
 	}
@@ -43,7 +47,7 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 		return ErrorResponse(c, http.StatusForbidden, "access denied", nil)
 	}
 
-	res, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *pagination)
+	res, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *timeRange, *pagination)
 	if err != nil {
 		return ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
 	}
