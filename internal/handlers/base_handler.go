@@ -23,6 +23,7 @@ func NewBaseHandler(
 type Response struct {
 	Message string `json:"message"`
 	Data    any    `json:"data,omitempty"`
+	Total   int    `json:"total,omitempty"`
 }
 
 // ErrResponse is the type used for sending JSON around

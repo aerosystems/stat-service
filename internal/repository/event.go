@@ -20,19 +20,24 @@ func NewEventRepo(es *elasticsearch.Client) *EventRepo {
 	}
 }
 
-func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]models.Event, error) {
+func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]models.Event, int, error) {
 	query := `{
 				  "query": {
 					"bool": {
 					  "must": [
 						{
-						  "match": {
+						  "term": {
 							"container.id": "checkmail-service.log"
 						  }
 						},
 						{
-						  "match": {
-							"message": "{\"projectToken\":\"` + projectToken + `\", \"event\":\"` + eventType + `\"}"
+						  "term": {
+							"projectToken": "` + projectToken + `"
+						  }
+						},
+						{
+						  "term": {
+							"eventType": "` + eventType + `"
 						  }
 						},
 						{
@@ -52,16 +57,17 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange 
 		e.es.Search.WithPretty(),
 		e.es.Search.WithSize(pagination.Limit),
 		e.es.Search.WithFrom(pagination.Offset),
-		e.es.Search.WithSort("@timestamp:desc"),
 		e.es.Search.WithSource("@timestamp", "message", "container"),
+		e.es.Search.WithSort("@timestamp:desc"),
+		e.es.Search.WithTrackTotalHits(true),
 	)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer res.Body.Close()
 	var r map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var eventList []models.Event
@@ -74,8 +80,9 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange 
 			continue
 		}
 		event := ESEvent.ToEventModel()
-		log.Println("@@@", message)
 		eventList = append(eventList, event)
 	}
-	return eventList, nil
+
+	total := int(r["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64))
+	return eventList, total, nil
 }

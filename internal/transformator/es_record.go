@@ -6,16 +6,16 @@ import (
 )
 
 type ElasticSearchRecord struct {
-	Domain       string `json:"domain"`
-	Duration     int    `json:"duration"`
-	Event        string `json:"event"`
-	Level        string `json:"level"`
-	Msg          string `json:"msg"`
-	ProjectToken string `json:"projectToken"`
-	RawData      string `json:"rawData"`
-	Source       string `json:"source"`
-	Time         string `json:"time"`
-	Type         string `json:"type"`
+	Domain        string `json:"domain"`
+	Duration      int    `json:"duration"`
+	EventType     string `json:"eventType"`
+	Level         string `json:"level"`
+	Msg           string `json:"msg"`
+	ProjectToken  string `json:"projectToken"`
+	RawData       string `json:"rawData"`
+	SourceInspect string `json:"sourceInspect"`
+	Time          string `json:"time"`
+	Type          string `json:"type"`
 }
 
 func (es *ElasticSearchRecord) ToEventModel() models.Event {
@@ -24,7 +24,7 @@ func (es *ElasticSearchRecord) ToEventModel() models.Event {
 		t = time.Now()
 	}
 	return models.Event{
-		Name:         es.Event,
+		Name:         es.EventType,
 		RawData:      es.RawData,
 		Domain:       es.Domain,
 		Type:         es.Type,

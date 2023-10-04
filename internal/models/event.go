@@ -16,5 +16,5 @@ type Event struct {
 }
 
 type EventRepository interface {
-	GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]Event, error)
+	GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]Event, int, error)
 }

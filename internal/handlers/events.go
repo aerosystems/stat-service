@@ -47,9 +47,13 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 		return ErrorResponse(c, http.StatusForbidden, "access denied", nil)
 	}
 
-	res, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *timeRange, *pagination)
+	res, total, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *timeRange, *pagination)
 	if err != nil {
 		return ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
 	}
-	return SuccessResponse(c, http.StatusOK, "OK", res)
+	return c.JSON(http.StatusOK, Response{
+		Message: "OK",
+		Data:    res,
+		Total:   total,
+	})
 }
