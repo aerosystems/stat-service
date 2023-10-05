@@ -6,7 +6,7 @@ import (
 )
 
 type Event struct {
-	Name         string    `json:"event"`
+	Name         string    `json:"name"`
 	RawData      string    `json:"rawData"`
 	Domain       string    `json:"domain"`
 	Type         string    `json:"type"`
