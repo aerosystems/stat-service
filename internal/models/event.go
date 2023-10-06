@@ -8,8 +8,10 @@ import (
 type Event struct {
 	Name         string    `json:"name"`
 	RawData      string    `json:"rawData"`
-	Domain       string    `json:"domain"`
-	Type         string    `json:"type"`
+	ErrorCode    int       `json:"errorCode,omitempty"`
+	ErrorMessage string    `json:"errorMessage,omitempty"`
+	Domain       string    `json:"domain,omitempty"`
+	Type         string    `json:"type,omitempty"`
 	ProjectToken string    `json:"projectToken"`
 	Duration     int       `json:"duration"`
 	Time         time.Time `json:"time"`

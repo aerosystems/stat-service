@@ -6,13 +6,15 @@ import (
 )
 
 type ElasticSearchRecord struct {
+	EventType     string `json:"eventType"`
+	RawData       string `json:"rawData"`
+	ErrorCode     int    `json:"errorCode"`
+	ErrorMessage  string `json:"errorMessage"`
 	Domain        string `json:"domain"`
 	Duration      int    `json:"duration"`
-	EventType     string `json:"eventType"`
 	Level         string `json:"level"`
 	Msg           string `json:"msg"`
 	ProjectToken  string `json:"projectToken"`
-	RawData       string `json:"rawData"`
 	SourceInspect string `json:"sourceInspect"`
 	Time          string `json:"time"`
 	Type          string `json:"type"`
@@ -26,6 +28,8 @@ func (es *ElasticSearchRecord) ToEventModel() models.Event {
 	return models.Event{
 		Name:         es.EventType,
 		RawData:      es.RawData,
+		ErrorCode:    es.ErrorCode,
+		ErrorMessage: es.ErrorMessage,
 		Domain:       es.Domain,
 		Type:         es.Type,
 		ProjectToken: es.ProjectToken,

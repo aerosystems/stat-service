@@ -13,6 +13,8 @@ definitions:
       data: {}
       message:
         type: string
+      total:
+        type: integer
     type: object
   models.Event:
     properties:
@@ -20,11 +22,13 @@ definitions:
         type: string
       duration:
         type: integer
-      event:
+      name:
         type: string
       projectToken:
         type: string
       rawData:
+        type: string
+      time:
         type: string
       type:
         type: string
@@ -61,6 +65,14 @@ paths:
         in: query
         name: offset
         type: integer
+      - description: Start time in RFC3339 format. Default NOW - 24 hours
+        in: query
+        name: startTime
+        type: string
+      - description: End time in RFC3339 format. Default NOW
+        in: query
+        name: endTime
+        type: string
       produces:
       - application/json
       responses:

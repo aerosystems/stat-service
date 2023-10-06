@@ -59,6 +59,18 @@ const docTemplate = `{
                         "description": "Offset. Must be integer. Default 0",
                         "name": "offset",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start time in RFC3339 format. Default NOW - 24 hours",
+                        "name": "startTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time in RFC3339 format. Default NOW",
+                        "name": "endTime",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -130,6 +142,9 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -142,13 +157,16 @@ const docTemplate = `{
                 "duration": {
                     "type": "integer"
                 },
-                "event": {
+                "name": {
                     "type": "string"
                 },
                 "projectToken": {
                     "type": "string"
                 },
                 "rawData": {
+                    "type": "string"
+                },
+                "time": {
                     "type": "string"
                 },
                 "type": {

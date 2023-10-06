@@ -73,7 +73,6 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange 
 	var eventList []models.Event
 	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
 		message := hit.(map[string]interface{})["_source"].(map[string]interface{})["message"].(string)
-		log.Println(message)
 		ESEvent := transformator.ElasticSearchRecord{}
 		err := json.Unmarshal([]byte(message), &ESEvent)
 		if err != nil {

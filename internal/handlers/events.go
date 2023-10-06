@@ -5,7 +5,6 @@ import (
 	RPCClient "github.com/aerosystems/stat-service/internal/rpc_client"
 	RangeService "github.com/aerosystems/stat-service/pkg/range_service"
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 )
 
@@ -19,6 +18,8 @@ import (
 // @Param projectToken query string true "Project Token"
 // @Param limit query int false "Limit. Must be integer. Default 10"
 // @Param offset query int false "Offset. Must be integer. Default 0"
+// @Param startTime query string false "Start time in RFC3339 format. Default NOW - 24 hours"
+// @Param endTime query string false "End time in RFC3339 format. Default NOW"
 // @Success 200 {object} Response{data=[]models.Event}
 // @Failure 400 {object} ErrResponse
 // @Failure 401 {object} ErrResponse
@@ -31,29 +32,31 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 	projectToken := c.QueryParam("projectToken")
 	pagination, err := RangeService.GetLimitPaginationFromQuery(c.QueryParams())
 	if err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
+		return ErrorResponse(c, http.StatusBadRequest, 400801, err.Error(), err)
 	}
 	timeRange, err := RangeService.GetTimeRangeFromQuery(c.QueryParams())
 	if err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
+		return ErrorResponse(c, http.StatusBadRequest, 400802, err.Error(), err)
 	}
 
 	projectList, err := RPCClient.GetProjectList(userId)
 	if err != nil {
-		log.Println(err)
-		return ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
+		return ErrorResponse(c, http.StatusInternalServerError, 500801, "could not get events", err)
 	}
 	if helpers.ContainsProjectToken(*projectList, projectToken) && !helpers.ContainsString([]string{"admin", "support"}, userRole) {
-		return ErrorResponse(c, http.StatusForbidden, "access denied", nil)
+		return ErrorResponse(c, http.StatusForbidden, 403801, "access denied", nil)
 	}
 
 	res, total, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *timeRange, *pagination)
 	if err != nil {
-		return ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
+		return ErrorResponse(c, http.StatusInternalServerError, 500801, "could not get events", err)
+	}
+	if len(res) == 0 {
+		return ErrorResponse(c, http.StatusNotFound, 404801, "events not found", nil)
 	}
 	return c.JSON(http.StatusOK, Response{
-		Message: "OK",
-		Data:    res,
+		Message: "events successfully found",
 		Total:   total,
+		Data:    res,
 	})
 }

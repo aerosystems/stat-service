@@ -21,15 +21,15 @@ func NewBaseHandler(
 
 // Response is the type used for sending JSON around
 type Response struct {
-	Message string `json:"message"`
-	Data    any    `json:"data,omitempty"`
+	Message string `json:"message,omitempty"`
 	Total   int    `json:"total,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // ErrResponse is the type used for sending JSON around
 type ErrResponse struct {
 	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 	Data    any    `json:"data,omitempty"`
 }
 
@@ -45,10 +45,10 @@ func SuccessResponse(c echo.Context, statusCode int, message string, data any) e
 // ErrorResponse takes a response status code and arbitrary data and writes a json response to the client in depends on Header Accept and APP_ENV environment variable(has two possible values: dev and prod)
 // - APP_ENV=dev responds debug info level of error
 // - APP_ENV=prod responds just message about error [DEFAULT]
-func ErrorResponse(c echo.Context, statusCode int, message string, err error) error {
+func ErrorResponse(c echo.Context, statusCode, errorCode int, message string, err error) error {
 	// TODO: add custom codes for errors
 	payload := ErrResponse{
-		Code:    statusCode,
+		Code:    errorCode,
 		Message: message,
 	}
 
