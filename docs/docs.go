@@ -151,11 +151,20 @@ const docTemplate = `{
         "models.Event": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
                 "domain": {
                     "type": "string"
                 },
                 "duration": {
                     "type": "integer"
+                },
+                "errorCode": {
+                    "type": "integer"
+                },
+                "errorMessage": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -164,9 +173,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rawData": {
-                    "type": "string"
-                },
-                "time": {
                     "type": "string"
                 },
                 "type": {

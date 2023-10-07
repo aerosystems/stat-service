@@ -14,7 +14,7 @@ type Event struct {
 	Type         string    `json:"type,omitempty"`
 	ProjectToken string    `json:"projectToken"`
 	Duration     int       `json:"duration"`
-	Time         time.Time `json:"time"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
 
 type EventRepository interface {

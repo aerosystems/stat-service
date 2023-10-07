@@ -34,6 +34,6 @@ func (es *ElasticSearchRecord) ToEventModel() models.Event {
 		Type:         es.Type,
 		ProjectToken: es.ProjectToken,
 		Duration:     es.Duration,
-		Time:         t,
+		CreatedAt:    t,
 	}
 }
