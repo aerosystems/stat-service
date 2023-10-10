@@ -17,7 +17,7 @@ type ElasticSearchRecord struct {
 	ProjectToken  string `json:"projectToken"`
 	SourceInspect string `json:"sourceInspect"`
 	Time          string `json:"time"`
-	Type          string `json:"type"`
+	DomainType    string `json:"domainType"`
 }
 
 func (es *ElasticSearchRecord) ToEventModel() models.Event {
@@ -31,7 +31,7 @@ func (es *ElasticSearchRecord) ToEventModel() models.Event {
 		ErrorCode:    es.ErrorCode,
 		ErrorMessage: es.ErrorMessage,
 		Domain:       es.Domain,
-		Type:         es.Type,
+		DomainType:   es.DomainType,
 		ProjectToken: es.ProjectToken,
 		Duration:     es.Duration,
 		CreatedAt:    t,

@@ -22,6 +22,8 @@ definitions:
         type: string
       domain:
         type: string
+      domainType:
+        type: string
       duration:
         type: integer
       errorCode:
@@ -33,8 +35,6 @@ definitions:
       projectToken:
         type: string
       rawData:
-        type: string
-      type:
         type: string
     type: object
 host: api.verifire.com

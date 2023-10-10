@@ -157,6 +157,9 @@ const docTemplate = `{
                 "domain": {
                     "type": "string"
                 },
+                "domainType": {
+                    "type": "string"
+                },
                 "duration": {
                     "type": "integer"
                 },
@@ -173,9 +176,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rawData": {
-                    "type": "string"
-                },
-                "type": {
                     "type": "string"
                 }
             }

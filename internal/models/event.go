@@ -11,7 +11,7 @@ type Event struct {
 	ErrorCode    int       `json:"errorCode,omitempty"`
 	ErrorMessage string    `json:"errorMessage,omitempty"`
 	Domain       string    `json:"domain,omitempty"`
-	Type         string    `json:"type,omitempty"`
+	DomainType   string    `json:"domainType,omitempty"`
 	ProjectToken string    `json:"projectToken"`
 	Duration     int       `json:"duration"`
 	CreatedAt    time.Time `json:"createdAt"`
