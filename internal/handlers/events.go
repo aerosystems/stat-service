@@ -43,7 +43,7 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 	if err != nil {
 		return ErrorResponse(c, http.StatusInternalServerError, 500801, "could not get events", err)
 	}
-	if helpers.ContainsProjectToken(*projectList, projectToken) && !helpers.ContainsString([]string{"admin", "support"}, userRole) {
+	if helpers.ContainsProjectToken(*projectList, projectToken) && !helpers.ContainsString([]string{"staff"}, userRole) {
 		return ErrorResponse(c, http.StatusForbidden, 403801, "access denied", nil)
 	}
 
