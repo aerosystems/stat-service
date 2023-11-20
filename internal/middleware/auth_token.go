@@ -44,8 +44,8 @@ func AuthTokenMiddleware() echo.MiddlewareFunc {
 				return AuthorizationConfig.ErrorHandler(c, errors.New("token expired"))
 			}
 
-			echo.Context(c).Set("userId", accessTokenClaims.UserId)
-			echo.Context(c).Set("userRole", accessTokenClaims.UserRole)
+			echo.Context(c).Set("accessTokenClaims", accessTokenClaims)
+
 			return next(c)
 		}
 	}
