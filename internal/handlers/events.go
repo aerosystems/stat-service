@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"github.com/aerosystems/stat-service/internal/helpers"
-	RPCClient "github.com/aerosystems/stat-service/internal/rpc_client"
+	"github.com/aerosystems/stat-service/internal/models"
+	"github.com/aerosystems/stat-service/internal/services"
 	RangeService "github.com/aerosystems/stat-service/pkg/range_service"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -24,35 +25,31 @@ import (
 // @Failure 400 {object} ErrResponse
 // @Failure 401 {object} ErrResponse
 // @Failure 403 {object} ErrResponse
+// @Failure 404 {object} ErrResponse
 // @Failure 500 {object} ErrResponse
 // @Router /v1/events [get]
 func (h *BaseHandler) GetEvents(c echo.Context) error {
-	userId := c.Get("userId").(int)
-	userRole := c.Get("userRole").(string)
+	accessTokenClaims := c.Get("accessTokenClaims").(*services.AccessTokenClaims)
 	projectToken := c.QueryParam("projectToken")
 	pagination, err := RangeService.GetLimitPaginationFromQuery(c.QueryParams())
 	if err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, 400801, err.Error(), err)
+		return h.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
 	}
 	timeRange, err := RangeService.GetTimeRangeFromQuery(c.QueryParams())
 	if err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, 400802, err.Error(), err)
+		return h.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
 	}
 
-	projectList, err := RPCClient.GetProjectList(userId)
-	if err != nil {
-		return ErrorResponse(c, http.StatusInternalServerError, 500801, "could not get events", err)
-	}
-	if helpers.ContainsProjectToken(*projectList, projectToken) && !helpers.ContainsString([]string{"staff"}, userRole) {
-		return ErrorResponse(c, http.StatusForbidden, 403801, "access denied", nil)
+	if !h.eventService.IsAccess(projectToken, uuid.MustParse(accessTokenClaims.UserUuid)) {
+		return h.ErrorResponse(c, http.StatusForbidden, "access denied", nil)
 	}
 
-	res, total, err := h.eventRepo.GetByProjectToken(projectToken, "inspect", *timeRange, *pagination)
+	res, total, err := h.eventService.GetByProjectToken(projectToken, models.InspectEvent, *timeRange, *pagination)
 	if err != nil {
-		return ErrorResponse(c, http.StatusInternalServerError, 500801, "could not get events", err)
+		return h.ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
 	}
 	if len(res) == 0 {
-		return ErrorResponse(c, http.StatusNotFound, 404801, "events not found", nil)
+		return h.ErrorResponse(c, http.StatusNotFound, "events not found", nil)
 	}
 	return c.JSON(http.StatusOK, Response{
 		Message: "events successfully found",

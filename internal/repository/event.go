@@ -20,7 +20,7 @@ func NewEventRepo(es *elasticsearch.Client) *EventRepo {
 	}
 }
 
-func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]models.Event, int, error) {
+func (e *EventRepo) GetByProjectToken(projectToken string, kindEvent models.KindEvent, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]models.Event, int, error) {
 	query := `{
 				  "query": {
 					"bool": {
@@ -37,7 +37,7 @@ func (e *EventRepo) GetByProjectToken(projectToken, eventType string, timeRange 
 						},
 						{
 						  "term": {
-							"eventType": "` + eventType + `"
+							"kindEvent": "` + kindEvent.String() + `"
 						  }
 						},
 						{

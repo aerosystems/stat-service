@@ -2,20 +2,19 @@ package main
 
 import (
 	"github.com/aerosystems/stat-service/internal/handlers"
-	"github.com/sirupsen/logrus"
+	"github.com/aerosystems/stat-service/internal/middleware"
 )
 
 type Config struct {
-	Log         *logrus.Logger
-	BaseHandler *handlers.BaseHandler
+	baseHandler         *handlers.BaseHandler
+	oauthMiddleware     middleware.OAuthMiddleware
+	basicAuthMiddleware middleware.BasicAuthMiddleware
 }
 
-func NewConfig(
-	log *logrus.Logger,
-	baseHandler *handlers.BaseHandler,
-) *Config {
+func NewConfig(baseHandler *handlers.BaseHandler, oauthMiddleware middleware.OAuthMiddleware, basicAuthMiddleware middleware.BasicAuthMiddleware) *Config {
 	return &Config{
-		Log:         log,
-		BaseHandler: baseHandler,
+		baseHandler:         baseHandler,
+		oauthMiddleware:     oauthMiddleware,
+		basicAuthMiddleware: basicAuthMiddleware,
 	}
 }
