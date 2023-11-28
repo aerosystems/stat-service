@@ -48,7 +48,7 @@ func (h *BaseHandler) GetEvents(c echo.Context) error {
 	if err != nil {
 		return h.ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
 	}
-	if len(res) == 0 {
+	if total == 0 {
 		return h.ErrorResponse(c, http.StatusNotFound, "events not found", nil)
 	}
 	return c.JSON(http.StatusOK, Response{

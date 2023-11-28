@@ -9,10 +9,7 @@ type TimeRange struct {
 	End   time.Time
 }
 
-func NewTimeRange(
-	start time.Time,
-	end time.Time,
-) *TimeRange {
+func NewTimeRange(start time.Time, end time.Time) *TimeRange {
 	return &TimeRange{
 		start,
 		end,
