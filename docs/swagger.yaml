@@ -1,10 +1,10 @@
 basePath: /
 definitions:
-  handlers.ErrResponse:
+  handlers.ErrorResponse:
     properties:
       code:
         type: integer
-      data: {}
+      error: {}
       message:
         type: string
     type: object
@@ -37,7 +37,7 @@ definitions:
       rawData:
         type: string
     type: object
-host: api.verifire.com
+host: gw.verifire.com/stat
 info:
   contact:
     name: Artem Kostenko
@@ -94,19 +94,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handlers.ErrResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handlers.ErrResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/handlers.ErrResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.ErrResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get Events

@@ -22,11 +22,11 @@ import (
 // @Param startTime query string false "Start time in RFC3339 format. Default NOW - 24 hours"
 // @Param endTime query string false "End time in RFC3339 format. Default NOW"
 // @Success 200 {object} Response{data=[]models.Event}
-// @Failure 400 {object} ErrResponse
-// @Failure 401 {object} ErrResponse
-// @Failure 403 {object} ErrResponse
-// @Failure 404 {object} ErrResponse
-// @Failure 500 {object} ErrResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
 // @Router /v1/events [get]
 func (h *BaseHandler) GetEvents(c echo.Context) error {
 	accessTokenClaims := c.Get("accessTokenClaims").(*services.AccessTokenClaims)
