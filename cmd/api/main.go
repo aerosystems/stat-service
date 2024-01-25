@@ -30,7 +30,7 @@ const webPort = 80
 // @name Authorization
 // @description Should contain Access JWT Token, with the Bearer started
 
-// @host gw.verifire.com/stat
+// @host gw.verifire.app/stat
 // @schemes https
 // @BasePath /
 func main() {
