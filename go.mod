@@ -1,6 +1,6 @@
 module github.com/aerosystems/stat-service
 
-go 1.19
+go 1.22
 
 require (
 	github.com/elastic/go-elasticsearch/v8 v8.10.0
