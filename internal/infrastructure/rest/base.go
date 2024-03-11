@@ -1,34 +1,43 @@
-package handlers
+package rest
 
 import (
-	"github.com/aerosystems/stat-service/internal/services"
+	"github.com/aerosystems/stat-service/internal/config"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"strings"
 )
 
 type BaseHandler struct {
-	mode         string
-	log          *logrus.Logger
-	eventService services.EventService
+	mode      string
+	log       *logrus.Logger
+	cfg       *config.Config
+	validator validator.Validate
 }
 
 func NewBaseHandler(
-	mode string,
 	log *logrus.Logger,
-	eventService services.EventService,
+	mode string,
 ) *BaseHandler {
 	return &BaseHandler{
-		mode:         mode,
-		log:          log,
-		eventService: eventService,
+		mode:      mode,
+		log:       log,
+		validator: validator.Validate{},
 	}
+}
+
+type CreateProjectRequest struct {
+	UserUuid string `json:"userUuid" validate:"required,number" example:"66"`
+	Name     string `json:"name" validate:"required,min=3,max=128" example:"bla-bla-bla.com"`
+}
+
+type UpdateProjectRequest struct {
+	Name string `json:"name" validate:"required,min=3,max=128" example:"bla-bla-bla.com"`
 }
 
 // Response is the type used for sending JSON around
 type Response struct {
 	Message string `json:"message"`
-	Total   int    `json:"total,omitempty"`
 	Data    any    `json:"data,omitempty"`
 }
 

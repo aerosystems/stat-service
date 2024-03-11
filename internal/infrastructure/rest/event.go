@@ -1,4 +1,4 @@
-package handlers
+package rest
 
 import (
 	"github.com/aerosystems/stat-service/internal/models"
@@ -8,6 +8,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
+
+type EventHandler struct {
+	*BaseHandler
+	eventUsecase *EventUsecase
+}
 
 // GetEvents godoc
 // @Summary Get Events
@@ -28,28 +33,28 @@ import (
 // @Failure 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /v1/events [get]
-func (h *BaseHandler) GetEvents(c echo.Context) error {
+func (e EventHandler) GetEvents(c echo.Context) error {
 	accessTokenClaims := c.Get("accessTokenClaims").(*usecases.AccessTokenClaims)
 	projectToken := c.QueryParam("projectToken")
 	pagination, err := RangeService.GetLimitPaginationFromQuery(c.QueryParams())
 	if err != nil {
-		return h.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
+		return e.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
 	}
 	timeRange, err := RangeService.GetTimeRangeFromQuery(c.QueryParams())
 	if err != nil {
-		return h.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
+		return e.ErrorResponse(c, http.StatusBadRequest, err.Error(), err)
 	}
 
-	if !h.eventService.IsAccess(projectToken, uuid.MustParse(accessTokenClaims.UserUuid)) {
-		return h.ErrorResponse(c, http.StatusForbidden, "access denied", nil)
+	if !e.eventService.IsAccess(projectToken, uuid.MustParse(accessTokenClaims.UserUuid)) {
+		return e.ErrorResponse(c, http.StatusForbidden, "access denied", nil)
 	}
 
-	res, total, err := h.eventService.GetByProjectToken(projectToken, models.InspectEvent, *timeRange, *pagination)
+	res, total, err := e.eventService.GetByProjectToken(projectToken, models.InspectEvent, *timeRange, *pagination)
 	if err != nil {
-		return h.ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
+		return e.ErrorResponse(c, http.StatusInternalServerError, "could not get events", err)
 	}
 	if total == 0 {
-		return h.ErrorResponse(c, http.StatusNotFound, "events not found", nil)
+		return e.ErrorResponse(c, http.StatusNotFound, "events not found", nil)
 	}
 	return c.JSON(http.StatusOK, Response{
 		Message: "events successfully found",

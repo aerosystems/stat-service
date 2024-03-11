@@ -1,4 +1,4 @@
-package repository
+package elastic
 
 import (
 	"encoding/json"
