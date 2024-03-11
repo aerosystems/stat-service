@@ -1,4 +1,4 @@
-package elastic
+package ElasticClient
 
 import (
 	"crypto/tls"
@@ -11,18 +11,13 @@ import (
 	"time"
 )
 
-const (
-	numberConnectionAttempts = 10
-	caCertPath               = "/app/certs/es01.crt"
-)
+const numberConnectionAttempts = 10
 
-func NewClient() *elasticsearch.Client {
-	host := os.Getenv("ELASTIC_HOST")
-	if host == "" {
+func NewClient(elasticHost, elasticPassword, caCertPath string) *elasticsearch.Client {
+	if elasticHost == "" {
 		log.Panic("Elasticsearch host wasn't set")
 	}
-	password := os.Getenv("ELASTIC_PASSWORD")
-	if password == "" {
+	if elasticPassword == "" {
 		log.Panic("Elasticsearch password wasn't set")
 	}
 
@@ -34,7 +29,7 @@ func NewClient() *elasticsearch.Client {
 	caCertPool.AppendCertsFromPEM(caCert)
 	cfg := elasticsearch.Config{
 		Addresses: []string{
-			host,
+			elasticHost,
 		},
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -43,7 +38,7 @@ func NewClient() *elasticsearch.Client {
 		},
 	}
 
-	auth := base64.StdEncoding.EncodeToString([]byte("elastic:" + password))
+	auth := base64.StdEncoding.EncodeToString([]byte("elastic:" + elasticPassword))
 	cfg.Header = http.Header{}
 	cfg.Header.Set("Authorization", "Basic "+auth)
 

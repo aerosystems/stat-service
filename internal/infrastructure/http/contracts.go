@@ -1,7 +1,7 @@
 package HttpServer
 
 import (
-	OAuthService "github.com/aerosystems/customer-service/pkg/oauth"
+	OAuthService "github.com/aerosystems/stat-service/pkg/oauth"
 )
 
 type TokenService interface {

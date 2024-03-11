@@ -2,7 +2,7 @@ package HttpServer
 
 import (
 	"fmt"
-	"github.com/aerosystems/stat-service/internal/infrastructure/rest"
+	"github.com/aerosystems/stat-service/internal/infrastructure/http/handlers"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -12,13 +12,13 @@ const webPort = 80
 type Server struct {
 	log          *logrus.Logger
 	echo         *echo.Echo
-	eventHandler *rest.EventHandler
+	eventHandler *handlers.EventHandler
 	tokenService TokenService
 }
 
 func NewServer(
 	log *logrus.Logger,
-	eventHandler *rest.EventHandler,
+	eventHandler *handlers.EventHandler,
 	tokenService TokenService,
 
 ) *Server {

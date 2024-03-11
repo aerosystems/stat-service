@@ -1,34 +1,23 @@
-package RPCServices
+package rpc
 
 import (
-	RPCClient "github.com/aerosystems/stat-service/pkg/rpc_client"
+	"github.com/aerosystems/stat-service/internal/models"
+	RpcClient "github.com/aerosystems/stat-service/pkg/rpc_client"
 	"github.com/google/uuid"
 )
 
-type ProjectService interface {
-	GetProjectList(userUuid uuid.UUID) ([]ProjectRPCPayload, error)
-	GetProject(projectToken string) (*ProjectRPCPayload, error)
+type ProjectRepo struct {
+	rpcClient *RpcClient.ReconnectRpcClient
 }
 
-type ProjectRPC struct {
-	rpcClient *RPCClient.ReconnectRPCClient
-}
-
-func NewProjectRPC(rpcClient *RPCClient.ReconnectRPCClient) *ProjectRPC {
-	return &ProjectRPC{
+func NewProjectRepo(rpcClient *RpcClient.ReconnectRpcClient) *ProjectRepo {
+	return &ProjectRepo{
 		rpcClient: rpcClient,
 	}
 }
 
-type ProjectRPCPayload struct {
-	Id       int
-	UserUuid uuid.UUID
-	Name     string
-	Token    string
-}
-
-func (p *ProjectRPC) GetProjectList(userUuid uuid.UUID) ([]ProjectRPCPayload, error) {
-	var result []ProjectRPCPayload
+func (p *ProjectRepo) GetProjectList(userUuid uuid.UUID) ([]models.Project, error) {
+	var result []models.Project
 	if err := p.rpcClient.Call(
 		"ProjectServer.GetProjectList",
 		userUuid,
@@ -39,8 +28,8 @@ func (p *ProjectRPC) GetProjectList(userUuid uuid.UUID) ([]ProjectRPCPayload, er
 	return result, nil
 }
 
-func (p *ProjectRPC) GetProject(projectToken string) (*ProjectRPCPayload, error) {
-	var result ProjectRPCPayload
+func (p *ProjectRepo) GetProject(projectToken string) (*models.Project, error) {
+	var result models.Project
 	if err := p.rpcClient.Call(
 		"ProjectServer.GetProject",
 		projectToken,

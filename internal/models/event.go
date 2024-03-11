@@ -1,7 +1,6 @@
 package models
 
 import (
-	RangeService "github.com/aerosystems/stat-service/pkg/range_service"
 	"time"
 )
 
@@ -17,6 +16,12 @@ type Event struct {
 	CreatedAt    time.Time `json:"createdAt"`
 }
 
-type EventRepository interface {
-	GetByProjectToken(projectToken string, kindEvent KindEvent, timeRange RangeService.TimeRange, pagination RangeService.LimitPagination) ([]Event, int, error)
+type KindEvent string
+
+const (
+	InspectEvent KindEvent = "inspect"
+)
+
+func (k KindEvent) String() string {
+	return string(k)
 }

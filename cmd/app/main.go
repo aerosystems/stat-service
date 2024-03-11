@@ -1,18 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"github.com/aerosystems/stat-service/internal/handlers"
-	"github.com/aerosystems/stat-service/internal/middleware"
-	"github.com/aerosystems/stat-service/internal/repository"
-	RPCServices "github.com/aerosystems/stat-service/internal/rpc_services"
-	"github.com/aerosystems/stat-service/pkg/elastic"
-	"github.com/aerosystems/stat-service/pkg/logger"
-	RPCClient "github.com/aerosystems/stat-service/pkg/rpc_client"
-	"os"
+	"context"
+	"golang.org/x/sync/errgroup"
 )
-
-const webPort = 80
 
 // @title Stat Service API
 // @version 1.0.0
@@ -33,27 +24,22 @@ const webPort = 80
 // @schemes https
 // @BasePath /
 func main() {
-	log := logger.NewLogger(os.Getenv("HOSTNAME"))
+	app := InitApp()
 
-	elasticsearchClient := elastic.NewClient()
-	eventRepo := repository.NewEventRepo(elasticsearchClient)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	projectClientRPC := RPCClient.NewClient("tcp", "project-service:5001")
-	projectRPC := RPCServices.NewProjectRPC(projectClientRPC)
+	group, ctx := errgroup.WithContext(ctx)
 
-	eventService := usecases.NewEventServiceImpl(projectRPC, eventRepo)
+	group.Go(func() error {
+		return app.httpServer.Run()
+	})
 
-	baseHandler := handlers.NewBaseHandler(os.Getenv("APP_ENV"), log.Logger, eventService)
+	group.Go(func() error {
+		return app.handleSignals(ctx, cancel)
+	})
 
-	accessTokenService := usecases.NewAccessTokenServiceImpl(os.Getenv("ACCESS_SECRET"))
-
-	oauthMiddleware := middleware.NewOAuthMiddlewareImpl(accessTokenService)
-	basicAuthMiddleware := middleware.NewBasicAuthMiddlewareImpl(os.Getenv("BASIC_AUTH_DOCS_USERNAME"), os.Getenv("BASIC_AUTH_DOCS_PASSWORD"))
-
-	app := NewConfig(baseHandler, oauthMiddleware, basicAuthMiddleware)
-	e := app.NewRouter()
-	middleware.AddLog(e, log.Logger)
-	if err := e.Start(fmt.Sprintf(":%d", webPort)); err != nil {
-		log.Fatal(err)
+	if err := group.Wait(); err != nil {
+		app.log.Errorf("error occurred: %v", err)
 	}
 }
