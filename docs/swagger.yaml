@@ -13,8 +13,6 @@ definitions:
       data: {}
       message:
         type: string
-      total:
-        type: integer
     type: object
   models.Event:
     properties:
@@ -37,7 +35,7 @@ definitions:
       rawData:
         type: string
     type: object
-host: gw.verifire.com/stat
+host: gw.verifire.dev/stat
 info:
   contact:
     name: Artem Kostenko

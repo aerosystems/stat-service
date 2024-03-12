@@ -148,9 +148,6 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
-                },
-                "total": {
-                    "type": "integer"
                 }
             }
         },
