@@ -15,7 +15,6 @@ import (
 	"github.com/aerosystems/stat-service/internal/usecases"
 	"github.com/aerosystems/stat-service/pkg/elastic_client"
 	"github.com/aerosystems/stat-service/pkg/logger"
-	"github.com/aerosystems/stat-service/pkg/oauth"
 	"github.com/aerosystems/stat-service/pkg/rpc_client"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/sirupsen/logrus"
@@ -35,8 +34,7 @@ func InitApp() *App {
 	projectRepo := ProvideProjectRepo(reconnectRpcClient)
 	eventUsecase := ProvideEventUsecase(eventRepo, projectRepo)
 	eventHandler := ProvideEventHandler(baseHandler, eventUsecase)
-	accessTokenService := ProvideAccessTokenService(config)
-	server := ProvideHttpServer(logrusLogger, eventHandler, accessTokenService)
+	server := ProvideHttpServer(logrusLogger, config, eventHandler)
 	app := ProvideApp(logrusLogger, config, server)
 	return app
 }
@@ -49,11 +47,6 @@ func ProvideLogger() *logger.Logger {
 func ProvideConfig() *config.Config {
 	configConfig := config.NewConfig()
 	return configConfig
-}
-
-func ProvideHttpServer(log *logrus.Logger, eventHandler *handlers.EventHandler, tokenService HttpServer.TokenService) *HttpServer.Server {
-	server := HttpServer.NewServer(log, eventHandler, tokenService)
-	return server
 }
 
 func ProvideEventHandler(baseHandler *handlers.BaseHandler, eventUsecase handlers.EventUsecase) *handlers.EventHandler {
@@ -82,6 +75,10 @@ func ProvideApp(log *logrus.Logger, cfg *config.Config, httpServer *HttpServer.S
 	return NewApp(log, cfg, httpServer)
 }
 
+func ProvideHttpServer(log *logrus.Logger, cfg *config.Config, eventHandler *handlers.EventHandler) *HttpServer.Server {
+	return HttpServer.NewServer(log, cfg.AccessSecret, eventHandler)
+}
+
 func ProvideLogrusLogger(log *logger.Logger) *logrus.Logger {
 	return log.Logger
 }
@@ -96,8 +93,4 @@ func ProvideRpcClient(cfg *config.Config) *RpcClient.ReconnectRpcClient {
 
 func ProvideElasticClient(cfg *config.Config) *elasticsearch.Client {
 	return ElasticClient.NewClient(cfg.ElasticHost, cfg.ElasticPassword, cfg.ElasticCrtPath)
-}
-
-func ProvideAccessTokenService(cfg *config.Config) *OAuthService.AccessTokenService {
-	return OAuthService.NewAccessTokenService(cfg.AccessSecret)
 }

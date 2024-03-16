@@ -12,7 +12,6 @@ import (
 	"github.com/aerosystems/stat-service/internal/usecases"
 	ElasticClient "github.com/aerosystems/stat-service/pkg/elastic_client"
 	"github.com/aerosystems/stat-service/pkg/logger"
-	OAuthService "github.com/aerosystems/stat-service/pkg/oauth"
 	RpcClient "github.com/aerosystems/stat-service/pkg/rpc_client"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/google/wire"
@@ -22,7 +21,6 @@ import (
 //go:generate wire
 func InitApp() *App {
 	panic(wire.Build(
-		wire.Bind(new(HttpServer.TokenService), new(*OAuthService.AccessTokenService)),
 		wire.Bind(new(handlers.EventUsecase), new(*usecases.EventUsecase)),
 		wire.Bind(new(usecases.EventRepository), new(*elastic.EventRepo)),
 		wire.Bind(new(usecases.ProjectRepository), new(*rpc.ProjectRepo)),
@@ -38,7 +36,6 @@ func InitApp() *App {
 		ProvideProjectRepo,
 		ProvideRpcClient,
 		ProvideElasticClient,
-		ProvideAccessTokenService,
 	))
 }
 
@@ -54,8 +51,8 @@ func ProvideConfig() *config.Config {
 	panic(wire.Build(config.NewConfig))
 }
 
-func ProvideHttpServer(log *logrus.Logger, eventHandler *handlers.EventHandler, tokenService HttpServer.TokenService) *HttpServer.Server {
-	panic(wire.Build(HttpServer.NewServer))
+func ProvideHttpServer(log *logrus.Logger, cfg *config.Config, eventHandler *handlers.EventHandler) *HttpServer.Server {
+	return HttpServer.NewServer(log, cfg.AccessSecret, eventHandler)
 }
 
 func ProvideLogrusLogger(log *logger.Logger) *logrus.Logger {
@@ -88,8 +85,4 @@ func ProvideRpcClient(cfg *config.Config) *RpcClient.ReconnectRpcClient {
 
 func ProvideElasticClient(cfg *config.Config) *elasticsearch.Client {
 	return ElasticClient.NewClient(cfg.ElasticHost, cfg.ElasticPassword, cfg.ElasticCrtPath)
-}
-
-func ProvideAccessTokenService(cfg *config.Config) *OAuthService.AccessTokenService {
-	return OAuthService.NewAccessTokenService(cfg.AccessSecret)
 }
