@@ -19,7 +19,7 @@ func NewProjectRepo(rpcClient *RpcClient.ReconnectRpcClient) *ProjectRepo {
 func (p *ProjectRepo) GetProjectList(userUuid uuid.UUID) ([]models.Project, error) {
 	var result []models.Project
 	if err := p.rpcClient.Call(
-		"ProjectServer.GetProjectList",
+		"Server.GetProjectList",
 		userUuid,
 		&result,
 	); err != nil {
@@ -31,7 +31,7 @@ func (p *ProjectRepo) GetProjectList(userUuid uuid.UUID) ([]models.Project, erro
 func (p *ProjectRepo) GetProject(projectToken string) (*models.Project, error) {
 	var result models.Project
 	if err := p.rpcClient.Call(
-		"ProjectServer.GetProject",
+		"Server.GetProject",
 		projectToken,
 		&result,
 	); err != nil {
